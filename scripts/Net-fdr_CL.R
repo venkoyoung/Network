@@ -2,7 +2,9 @@
 library(QUIC)
 library(igraph)
 library(optparse)
-
+library(utils)
+library(parallel)
+##############################################################
 option_list = list(
   make_option(c("-f", "--file"), type="character", default=NULL, 
               help="matrix file name", metavar="character"),
@@ -15,8 +17,10 @@ option_list = list(
   make_option(c("-i", "--interval"), type="numeric", default="0.05", 
               help="intervale between each rho computation [default= %default]", metavar="character"),
   make_option(c("-c", "--cores"), type="numeric", default="1", 
-              help="number of cores to use[default= %default]", metavar="character")
-  )
+              help="number of cores to use[default= %default]", metavar="character"),
+  make_option(c("-b", "--bin"), type="numeric", default=getwd(), 
+              help="abs path folder of scripts [default= %default]", metavar="character")
+    )
 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
@@ -25,7 +29,6 @@ if (is.null(opt$file)){
   print_help(opt_parser)
   stop("At least one argument must be supplied (input file).n", call.=FALSE)
 }
-
 ##############################################
 t_Zvals<-read.table(opt$file)
 sampleData <- as.matrix(t_Zvals)
@@ -34,8 +37,13 @@ NumRandomM<-opt$random
 start<-opt$start
 end<-opt$end
 interval<-opt$interval
-
+ncores <-opt$cores
 print(c(start,end, interval, NumRandomM))
-source("~/Dropbox (CRG ADV)/Personal_Estefania/Network/Network/scripts/CRobCor.R")
-source("~/Dropbox (CRG ADV)/Personal_Estefania/Network/Network/scripts/functions_fdr_noMC.R")
-estimateFDR(  inputM=sampleData,  NumRandomM,  start,  end,  interval)
+scripts<-opt$bin
+sc1<-paste(scripts, "CRobCor.R", sep="/")
+sc3<-paste(scripts, "functions_fdr_MC.R", sep="/")
+source(sc1)
+source(sc3)
+
+estimateFDR(  inputM=sampleData,  NumRandomM,  start,  end,  interval, ncores)
+

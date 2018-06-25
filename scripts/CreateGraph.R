@@ -44,9 +44,11 @@ CreateGraph<-function(C,rho){
   E(g)$color<-ifelse(E(Tg)$weight<0,"#55885599","#BB111199")
   V(g)$label_color="#222222"
   l<-layout.fruchterman.reingold(g)
-  #size<-rescale(betweenness(g),  c(min(betweenness(g)), max(betweenness(g)) ))
+  pdf("plot.pdf")
+  plot(g, layout=l, vertex.size=50,rescale=FALSE, xlim=range(l[,1]),ylim=range(l[,2]),vertex.frame.color=paste(colbar[comps+1],"77",sep=""),vertex.label=V(g)$labels,vertex.label.dist=3,vertex.label.cex=0.7,vertex.label.font=4,
+       vertex.label.color=V(g)$label_color,asp=0.72)
+  dev.off()
   size<-rescale(betweenness(g),   c(5, 30) )
-  
   ##########
   gList<-list(g, memb, Centr_G)
   return(gList)

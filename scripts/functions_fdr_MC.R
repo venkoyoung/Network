@@ -22,7 +22,6 @@ createRandomMatrix<-function(TrueM, NumRandomM)
 ####################################################################
 getEdges<- function(C, rho)
 {
-  print(dim(C))
   RHO<-matrix(data=rho,nrow=nrow(C),ncol=ncol(C)) 
   Cquic<-QUIC(C,rho=RHO,tol=1e-02,maxIter=100)
   InvCov<-Cquic$X
@@ -34,19 +33,20 @@ getEdges<- function(C, rho)
 }
 ######################################################################
 #agregar from to como parametros
-getEdgesByRHO<-function(RList,start,end, interval)
+getEdgesByRHO<-function(RList,start,end, interval, ncores)
 {
   
   MList<-vector("list", length(seq(start, end, interval)))
   for(rho in seq(start,
                  end, interval))
   {
-    res<-unlist(lapply(RList,  getEdges,  rho))
+    res<-unlist(mclapply(RList,  getEdges,  rho, mc.cores = cores))
     MList[[i]] <- res
     i <- i + 1
   }
   return(MList)
 }
+
 ######################################################################
 getADJ<- function(C, rho)
 {
@@ -57,28 +57,28 @@ getADJ<- function(C, rho)
   return(ADJ)
 }
 #########################################################################
-getADJRHO<-function(RList, start,end, interval)
+getADJRHO<-function(RList, start,end, interval, ncores)
 {
   MList<-vector("list", length(seq(start, end , interval)))
   i=1
   for(rho in seq(start, end , interval))
   {
-    res<-lapply(RList,  getADJ,  rho)
+    res<-mclapply(RList,  getADJ,  rho, mc.cores = ncores)
     MList[[i]] <- res
     i <- i + 1
   }
   return(MList)
 }
 #######################################################################
-getPositiveValues<-function(ADJList){
+getPositiveValues<-function(ADJList, ncores){
   totalPos<-vector()
   for (i in 1:length(ADJList))  {
-    ll<-lapply(ADJList[[i]],
-               function(x)
-               {
-                 PosValues<-length(which( unlist(x)>0 ) )
-                 return(PosValues)
-               }
+    ll<-mclapply(ADJList[[i]],
+                 function(x)
+                 {
+                   PosValues<-length(which( unlist(x)>0 ) )
+                   return(PosValues)
+                 }, mc.cores = ncores
     )   
     totalPos<-c(totalPos, ll)
   }
@@ -99,33 +99,20 @@ getEdgesBySample<-function(rrlist, rho)
   return(RRList)
 }
 #############################################################
-getEdgesByRHOmc<-function(RList,start,end, interval, cores)
+getEdgesByRHO<-function(RList,start,end, interval, ncores)
 {
   MList<-vector("list", length(seq(start, end, interval)))
   i=1
   for(rho in seq(start,
                  end, interval))
   {
-    res<-unlist(mclapply(RList,  getEdges,  rho, mc.cores = cores))
+    res<-unlist(mclapply(RList,  getEdges,  rho, mc.cores = ncores))
     MList[[i]] <- res
     i <- i + 1
   }
   return(MList)
 }
-#############################################################
-getEdgesByRHO<-function(RList,start,end, interval)
-{
-  MList<-vector("list", length(seq(start, end, interval)))
-  i=1
-  for(rho in seq(start,
-                 end, interval))
-  {
-    res<-unlist(lapply(RList,  getEdges,  rho))
-    MList[[i]] <- res
-    i <- i + 1
-  }
-  return(MList)
-}
+
 #########################Plots###########################################
 plots<-function(
   start,
@@ -134,7 +121,8 @@ plots<-function(
   trueEdges,
   trueMEAN,
   randomEdges,
-  randomMEAN
+  randomMEAN,
+  ncores
   )
 {
 ratioNumberOfEdges<-randomEdges/ trueEdges*100
@@ -246,7 +234,8 @@ estimateFDR<-function(
   NumRandomM=10,
   start=0.3,
   end=1,
-  interval=0.05)
+  interval=0.05,
+  ncores=1)
 {
   TrueList<-vector("list",1)
   TrueList[[1]]<-sampleData
@@ -257,24 +246,24 @@ estimateFDR<-function(
   RList <- vector("list", length(RandomList))
   RList<-lapply(RandomList, CRobCor)# paraleliza OK
   TPList<-rep(TPList, NumRandomM)
-  RandomEdgesList<-getEdgesByRHO(RList, start, end, interval)
+  RandomEdgesList<-getEdgesByRHO(RList, start, end, interval, ncores)
   print(paste("Lenght of random edge list:",length(RandomEdgesList))) 
-  TrueEdgesList<-getEdgesByRHO(TPList, start, end, interval)
+  TrueEdgesList<-getEdgesByRHO(TPList, start, end, interval, ncores)
   print(paste("Lenght of true edge list:", length(TrueEdgesList)   )  ) 
   trueEdges<-unlist(lapply(TrueEdgesList, mean))
   randomEdges<- unlist(lapply(RandomEdgesList, mean))
   ##################################################
   #Using adjacency matrix
-  TrueAdjMatrix<-getADJRHO(TPList, start, end , interval)
+  TrueAdjMatrix<-getADJRHO(TPList, start, end , interval, ncores)
   print(paste("Lenght of true adj matrix list", length(TrueAdjMatrix) )  ) 
-  RandomAdjMatrix<-getADJRHO(RList, start, end , interval)
+  RandomAdjMatrix<-getADJRHO(RList, start, end , interval, ncores)
   message(paste("Lenght of random adj matrix list",  length(RandomAdjMatrix)  )  ) 
   ##################################################
   #from here divide by 2
-  tp<-unlist(getPositiveValues(TrueAdjMatrix))/2
+  tp<-unlist(getPositiveValues(TrueAdjMatrix, ncores))/2
   trueValues<-matrix(nrow=length(seq(start, end, interval)), data=tp, byrow = T)
   trueMEAN<-rowMeans(trueValues)
-  rr<-unlist(getPositiveValues(RandomAdjMatrix))/2
+  rr<-unlist(getPositiveValues(RandomAdjMatrix, ncores))/2
   randomValues<-matrix(nrow=length(seq(start, end, interval)), data=rr, byrow = T)
   randomMEAN<-rowMeans(randomValues)
   ##################################################
@@ -286,7 +275,6 @@ estimateFDR<-function(
          randomEdges=randomEdges+0.01,
          randomMEAN=randomMEAN+0.01)#all together
   ##################################################
-  
   
 }
 
