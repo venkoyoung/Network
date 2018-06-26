@@ -1,16 +1,17 @@
 #desde aca vengo con el script renames
-plotNAs<-function(psi)
+plotNAs<-function(matrixI)
 {
-library(data.table)
-
-forPlot<-as.matrix(psi)
+forPlot<-matrixI
 forPlot[!is.na(forPlot)] <-1
 forPlot[is.na(forPlot)] <-4
 forPlotMelted<-data.table::melt(data=forPlot)
+print(dim(forPlotMelted))
+head(forPlotMelted)
+table(forPlotMelted$value)
 ####################################
 #only 2 colors
 pdf("withNs_hor_A4.pdf", width = 11.69,  height = 8.27)
-ggplot(forPlotMelted, 
+p<-ggplot(forPlotMelted, 
          aes(x = Var2, y = Var1, fill = factor(value)))  +
     theme_minimal() +
     geom_tile(position = "identity",  
@@ -26,8 +27,8 @@ ggplot(forPlotMelted,
       panel.border=element_blank(),
       legend.position="none",
       axis.line=element_blank()
-      
     )
+print(p)
   dev.off()
 }
 
