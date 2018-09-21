@@ -114,6 +114,7 @@ getEdgesByRHO<-function(RList,start,end, interval, ncores)
 }
 
 #########################Plots###########################################
+
 plots<-function(
   start,
   end,
@@ -122,14 +123,21 @@ plots<-function(
   trueMEAN,
   randomEdges,
   randomMEAN,
-  ncores
-  )
+  name  )
 {
+
+
 ratioNumberOfEdges<-randomEdges/ trueEdges*100
 ratioPositiveValues<-randomMEAN/trueMEAN*100
 eje1<-seq(start,end,interval)
+name<-name
 ###########################################################################################
-  file1<-paste(paste("NumberOfEdges_",paste(start,end,sep="-"), sep=""), ".png", sep="")
+file1<-paste(
+       paste(
+       paste("NumberOfEdges_", paste(start,end,sep="-"),sep="") 
+            , name, sep="_"),
+              ".png", sep="")
+
   png(file1)
   plot(eje1,
        trueEdges, 
@@ -146,7 +154,13 @@ eje1<-seq(start,end,interval)
   dev.off()
 message("Plot 1: Number of edges real / random data vs rho")
 ###########################################################################################
-  file2<-paste(paste("RatioNumberOfEdges_",paste(start,end,sep="-"), sep=""), ".png", sep="")
+file2<-paste(
+        paste(
+        paste("RatioNumberOfEdges_",
+        paste(start,end,sep="-"), sep=""), 
+        name, sep="_"),
+              ".png", sep="")
+
   png(file2)
   plot(eje1, (randomEdges/trueEdges)*100, 
        main="Ratio edges in random data vs real data",
@@ -155,7 +169,8 @@ message("Plot 1: Number of edges real / random data vs rho")
   dev.off()
 message("Plot 2: Ratio edges in random data vs real data")
 ###########################################################
-file3<-paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), ".png", sep="")
+file3<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
+
 png(file3)
 plot(eje1,
      trueMEAN, 
@@ -171,7 +186,7 @@ legend("topright",
 dev.off()
 message("Plot 3: Adj positive values and edges in real data")
 ##############################################
-file4<-paste(paste("RandomPositiveValues_",paste(start,end,sep="-"), sep=""), ".png", sep="")
+file4<-paste(paste(paste("RandomPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
 png(file4)
 plot(eje1,randomMEAN, 
      type="l", col="blue", 
@@ -184,7 +199,7 @@ legend("topright", c("edges","positives values"), lty = 1, col = c("red","blue")
 dev.off()
 message("Plot 4: Adj positive values and edges in random data")
 ##############################################
-file5<-paste(paste("Edges_vs_Positive_",paste(start,end,sep="-"), sep=""), ".png", sep="")
+file5<-paste(paste(paste("Edges_vs_Positive_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
 png(file5)
   plot(eje1,trueMEAN, 
        type="l", col="blue", 
@@ -207,7 +222,9 @@ dev.off()
 message("Plot 5: Adj Matrix positive values and edges in real and random data")
 #################################################  
 #ratios:
-file6<-paste(paste("Ratios_Edges_vs_Positives_",paste(start,end,sep="-"), sep=""), ".png", sep="")
+
+file6<-paste(paste(paste("Ratios_Edges_vs_Positives_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
+
 png(file6)
 plot(eje1,  
      ratioNumberOfEdges, 
@@ -228,6 +245,8 @@ legend("topright",
 dev.off()
 message("Plot 6: Ratios random/real")
 }
+
+
 ##################################################
 estimateFDR<-function(
   inputM=sampleData,
@@ -235,7 +254,8 @@ estimateFDR<-function(
   start=0.3,
   end=1,
   interval=0.05,
-  ncores=1)
+  ncores=1,
+  name)
 {
   TrueList<-vector("list",1)
   TrueList[[1]]<-sampleData
@@ -269,11 +289,22 @@ estimateFDR<-function(
   ##################################################
   #add an small correcction in order to avoid infinite values
   message("Finish computation. Lets plot.")
-  plots( start,  end, interval, 
+  
+print( start)
+print( end)
+print(interval)
+print(trueEdges+0.01)
+print(trueMEAN+0.01)
+print(randomEdges+0.01)
+print(randomMEAN+0.01)
+print(name)#all together
+
+ plots( start,  end, interval, 
          trueEdges=trueEdges+0.01,
          trueMEAN=trueMEAN+0.01,
          randomEdges=randomEdges+0.01,
-         randomMEAN=randomMEAN+0.01)#all together
+         randomMEAN=randomMEAN+0.01,
+	 name)#all together
   ##################################################
   
 }
