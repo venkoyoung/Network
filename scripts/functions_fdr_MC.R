@@ -156,8 +156,7 @@ file1df<-paste(
     paste("NumberOfEdges_", paste(start,end,sep="-"),sep="") 
     , name, sep="_"),
   ".tab", sep="")
-###########################################################################################
-df1<- data.frame(eje1, trueEdges)
+df1<- data.frame(rho=eje1,random=randomEdges,true=trueEdges, ratio=randomEdges/trueEdges)
 write.table(df1, file=file1df, sep="\t", col.names = NA)
 ###########################################################################################
 file2<-paste(
@@ -173,15 +172,6 @@ file2<-paste(
   abline(h=c(0,5,10))
   dev.off()
 message("Plot 2: Ratio edges in random data vs real data")
-###########################################################
-file2df<-paste(
-  paste(
-    paste("RatioNumberOfEdges_",
-          paste(start,end,sep="-"), sep=""), 
-    name, sep="_"),
-  ".tab", sep="")
-df2<- data.frame(eje1,round(randomEdges/trueEdges)*100)
-write.table(df2, file=file2df, sep="\t", col.names = NA)
 ###########################################################
 file3<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
 png(file3)
@@ -201,9 +191,6 @@ message("Plot 3: Adj positive values and edges in real data")
 ##############################################
 file3df<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), 
                      name, sep="_"),".tab", sep="")
-
-df3<- data.frame(round(randomEdges/trueEdges)*100)
-write.table(df2, file=file2df, sep="\t", col.names = NA)
 
 ##############################################
 file4<-paste(paste(paste("RandomPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
@@ -242,9 +229,7 @@ dev.off()
 message("Plot 5: Adj Matrix positive values and edges in real and random data")
 #################################################  
 #ratios:
-
 file6<-paste(paste(paste("Ratios_Edges_vs_Positives_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
-
 png(file6)
 plot(eje1,  
      ratioNumberOfEdges, 
