@@ -158,7 +158,6 @@ file1df<-paste(
   ".tab", sep="")
 ###########################################################################################
 df1<- data.frame(eje1, trueEdges)
-colnames(df1)<-c("rho", name)
 write.table(df1, file=file1df, sep="\t", col.names = NA)
 ###########################################################################################
 file2<-paste(
@@ -182,7 +181,6 @@ file2df<-paste(
     name, sep="_"),
   ".tab", sep="")
 df2<- data.frame(eje1,round(randomEdges/trueEdges)*100)
-colnames(df2)<-c("rho",name)
 write.table(df2, file=file2df, sep="\t", col.names = NA)
 ###########################################################
 file3<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
@@ -205,8 +203,6 @@ file3df<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep="
                      name, sep="_"),".tab", sep="")
 
 df3<- data.frame(round(randomEdges/trueEdges)*100)
-rownames(df2)<-name
-colnames(df2)<-eje1
 write.table(df2, file=file2df, sep="\t", col.names = NA)
 
 ##############################################
@@ -273,7 +269,7 @@ message("Plot 6: Ratios random/real")
 
 ##################################################
 estimateFDR<-function(
-  inputM=sampleData,
+  inputM=sampleData,#eventscaled
   NumRandomM=10,
   start=0.3,
   end=1,
