@@ -157,9 +157,8 @@ file1df<-paste(
     , name, sep="_"),
   ".tab", sep="")
 ###########################################################################################
-df1<- data.frame(trueEdges)
-rownames(df1)<-name
-colnames(df1)<-eje1
+df1<- data.frame(eje1, trueEdges)
+colnames(df1)<-c("rho", name)
 write.table(df1, file=file1df, sep="\t", col.names = NA)
 ###########################################################################################
 file2<-paste(
@@ -168,7 +167,6 @@ file2<-paste(
         paste(start,end,sep="-"), sep=""), 
         name, sep="_"),
               ".png", sep="")
-
   png(file2)
   plot(eje1, (randomEdges/trueEdges)*100, 
        main="Ratio edges in random data vs real data",
@@ -177,8 +175,17 @@ file2<-paste(
   dev.off()
 message("Plot 2: Ratio edges in random data vs real data")
 ###########################################################
+file2df<-paste(
+  paste(
+    paste("RatioNumberOfEdges_",
+          paste(start,end,sep="-"), sep=""), 
+    name, sep="_"),
+  ".tab", sep="")
+df2<- data.frame(eje1,round(randomEdges/trueEdges)*100)
+colnames(df2)<-c("rho",name)
+write.table(df2, file=file2df, sep="\t", col.names = NA)
+###########################################################
 file3<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
-
 png(file3)
 plot(eje1,
      trueMEAN, 
@@ -193,6 +200,15 @@ legend("topright",
        lty = 1, col = c("red","blue"))
 dev.off()
 message("Plot 3: Adj positive values and edges in real data")
+##############################################
+file3df<-paste(paste(paste("RealPositiveValues_",paste(start,end,sep="-"), sep=""), 
+                     name, sep="_"),".tab", sep="")
+
+df3<- data.frame(round(randomEdges/trueEdges)*100)
+rownames(df2)<-name
+colnames(df2)<-eje1
+write.table(df2, file=file2df, sep="\t", col.names = NA)
+
 ##############################################
 file4<-paste(paste(paste("RandomPositiveValues_",paste(start,end,sep="-"), sep=""), name, sep="_"),".png", sep="")
 png(file4)
