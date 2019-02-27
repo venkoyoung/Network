@@ -161,11 +161,11 @@ print(getwd())
 }
 
 #####################################################################
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/randomA3_30_15/")
+setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/random/exons/")
 scaledfiles<-read.table("scaledfiles.csv", header = T, stringsAsFactors = F ,sep="\t")
 head(scaledfiles)
 
-  for (i in 1:nrow(scaledfiles))
+for (i in 1:nrow(scaledfiles))
   {
     file<-scaledfiles$file[i]  
     print(file)
