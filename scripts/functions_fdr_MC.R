@@ -114,7 +114,6 @@ getEdgesByRHO<-function(RList,start,end, interval, ncores)
 }
 
 #########################Plots###########################################
-
 plots<-function(
   start,
   end,
@@ -126,7 +125,6 @@ plots<-function(
   name  )
 {
 
-
 ratioNumberOfEdges<-randomEdges/ trueEdges*100
 ratioPositiveValues<-randomMEAN/trueMEAN*100
 eje1<-seq(start,end,interval)
@@ -137,7 +135,6 @@ file1<-paste(
        paste("NumberOfEdges_", paste(start,end,sep="-"),sep="") 
             , name, sep="_"),
               ".png", sep="")
-
   png(file1)
   plot(eje1,
        trueEdges, 
@@ -153,6 +150,17 @@ file1<-paste(
          c("real data","random data"), lty = 1, col = c("blue","red"))
   dev.off()
 message("Plot 1: Number of edges real / random data vs rho")
+###########################################################################################
+file1df<-paste(
+  paste(
+    paste("NumberOfEdges_", paste(start,end,sep="-"),sep="") 
+    , name, sep="_"),
+  ".tab", sep="")
+###########################################################################################
+df1<- data.frame(trueEdges)
+rownames(df1)<-name
+colnames(df1)<-eje1
+write.table(df1, file=file1df, sep="\t", col.names = NA)
 ###########################################################################################
 file2<-paste(
         paste(
@@ -310,3 +318,4 @@ print(name)#all together
 }
 
 
+  
