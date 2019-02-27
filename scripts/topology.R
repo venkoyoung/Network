@@ -1,7 +1,6 @@
 #first generate data: TRUE and RANDOM DATA
 library(QUIC)
 library(igraph)
-library(corrplot)
 library("RColorBrewer")
 library(scales)
 source("~/Dropbox (CRG ADV)/Personal_Estefania/Network/Network/scripts/CRobCor.R")
@@ -10,10 +9,7 @@ source("~/Dropbox (CRG ADV)/Personal_Estefania/Network/Network/scripts/CreateGra
 source("~/Dropbox (CRG ADV)/Personal_Estefania/Network/Network/scripts/CentralityRanking.R")
 source("~/Dropbox (CRG ADV)/Personal_Estefania/Network/Network/scripts/Vscale.R")
 library(igraph)
-setwd("~/Dropbox (CRG ADV)/Personal_Gosia/Shared/GosiaAndEstefi/Hg38/suppa_vtools/results/VT_compatibleSuppa/")
-# Rho was set to achieve FDR < 5%
-#para cada nueva nwtwork tengo que hacer esto:
-#IR All
+############################################################
 getMeanDeg<-function(start, end, gap, Cdouble, name)
 {
   
@@ -31,16 +27,17 @@ getMeanDeg<-function(start, end, gap, Cdouble, name)
     plot(df$rho, df$md, xlim=c(0,1), ylim=c(0,max(df$md)), type = "l", main=paste("Mean degree", name))
     abline(h=6)
     dev.off()
-    
-  }
   
-  return(df)
+}
+  
+return(df)
 }
 
 ###############################################################################
-NetworkDesc<-function(g, name)
+NetworkDesc<-function(g, name, rho)
   {
 df<-data.frame()
+dfSmall<-data.frame()
 df[1,1]<-"NumOfEdges"
 df[1,2]<-length(E(g))#547
 print(paste("NumOfEdges",length(E(g)), sep=": " ))
@@ -53,24 +50,28 @@ deg.dist <- degree_distribution(g, cumulative=T, mode="all")
 df[3,1]<-"MeanDegree"
 df[3,2]<-mean(deg)#3.97
 print(paste("MeanDegree",round(mean(deg),2), sep=": " ))
-
 file1<-paste(name,"cumulativeFreq.png" , sep="_")
 print(file1)
+########################################################
 png(file1)
 plot( x=0:max(deg), y=1-deg.dist, pch=19, cex=1.2, col="orange", 
-      xlab="Degree", ylab="Cumulative Frequency")
+      xlab="Degree", ylab="Cumulative Frequency", main=name)
 dev.off()
+##################################################################
+file1df<-paste(name,"cumulativeFreq.tab" , sep="_")
+print(file1df)
+df1<-data.frame( deg=0:max(deg), cum=1-deg.dist)
+write.table(df1, file=file1df, sep="\t", col.names = NA)
 ########################################################
 file2<-paste(name, "HistDegree.png", sep="_")
 print(file2)
 png(file2)
-hist(deg)
+hist(deg, main=name)
 dev.off()
 #densidad:
 df[4,1]<-"EdgeDensity"
 df[4,2]<-edge_density(g, loops = FALSE)
 print(paste("EdgeDensity",round(edge_density(g, loops = FALSE),2), sep=": " ))
-
 
 shortest.paths(g)
 diameter(g,directed=FALSE,unconnected=FALSE,weights=NULL)
@@ -125,12 +126,19 @@ dev.off()
 file4<-paste(name, "df.tab", sep="_")
 write.table(df, file4, sep="\t")
 
+file4<-paste(name, "df_small.tab", sep="_")
+dfSmall<-cbind(rho=rho, t(df[1:5,]))
+head(dfSmall)
+write.table(dfSmall, file4, sep="\t")
+
+###################################################
 df2<-get.edgelist(g)
 colnames(df2)<-c("source", "target")
 file5<-paste(name, "edgelist.tab", sep="_")
 write.table(df2, file5, col.names = NA, quote = F, sep="\t")
 
 DG<-degree(g)
+NDG<-DG / df[1,2]
 PR<-page.rank(g)$vector  		#Pagerank Score
 OPR<-order(PR,decreasing=TRUE)
 BC<-betweenness(g)		#Betweeness Centrality
@@ -144,32 +152,33 @@ ORANK<-order(RANK,decreasing=TRUE)	#Ordering of Nodes based on aggregate score.
 
 file6<-paste(name, "CentralityRanking.tab", sep="_")
 
-df3<-data.frame(DG,PR,OPR,BC,OBC,CC,OCC,RANK,ORANK)
-
+df3<-data.frame(DG,NDG,PR,OPR,BC,OBC,CC,OCC,RANK,ORANK)
+head(df3)
 write.table(df3, file6, col.names = NA, quote = F, sep="\t")
 print(getwd())
-
+##############################################################
+#normalized degree
 }
 
-######################################################
-dir.create("topo")
-setwd(topo)
-getwd()
+#####################################################################
+setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/randomA3_30_15/")
+scaledfiles<-read.table("scaledfiles.csv", header = T, stringsAsFactors = F ,sep="\t")
+head(scaledfiles)
 
-setwd("~/Dropbox (CRG ADV)/Personal_Gosia/Shared/GosiaAndEstefi/Hg38/suppa_vtools/results/VT_compatibleSuppa/")#VT
-setwd("~/Dropbox (CRG ADV)/Personal_Gosia/Shared/GosiaAndEstefi/Hg38/suppa_vtools/eventscaled_suppa/")#suppa
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/subsets/")#antiguos
-setwd("~/Dropbox (CRG ADV)/Personal_Gosia/Shared/GosiaAndEstefi/Hg38/newVTHS2/selected events/eventsScaled/")
-dir.create("topo")
-setwd("topo/")
-
-#############################################################################
-  M<-read.table("../INTRONS_30_changing_eventscaled.tab"); head(M)
-  Cdouble <- CRobCor(M)
-  gListDouble<-CreateGraph(Cdouble,rho=0.48) 
-  gList<-gListDouble
-  g<-gList[[1]]
-  name<-"IR changing"
-  NetworkDesc(g, name)
-  #############################################################################
-
+  for (i in 1:nrow(scaledfiles))
+  {
+    file<-scaledfiles$file[i]  
+    print(file)
+    name<-gsub("_eventscaled.tab", "", scaledfiles$file[i])
+    print(name)
+    rho<-scaledfiles$rho[i]
+    print(rho)
+    M<-read.table(file); print(dim(M))
+    Cdouble <- CRobCor(M)
+    gListDouble<-CreateGraph(Cdouble,rho) 
+    gList<-gListDouble
+    g<-gList[[1]]
+    NetworkDesc(g, name, rho)
+    }
+  
+  
