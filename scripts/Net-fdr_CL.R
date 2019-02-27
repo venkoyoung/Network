@@ -19,7 +19,9 @@ option_list = list(
   make_option(c("-c", "--cores"), type="numeric", default="1", 
               help="number of cores to use[default= %default]", metavar="character"),
   make_option(c("-b", "--bin"), type="numeric", default=getwd(), 
-              help="abs path folder of scripts [default= %default]", metavar="character")
+              help="abs path folder of scripts [default= %default]", metavar="character"),
+  make_option(c("-n", "--name"), type="character", default="test",
+             help="abs path folder of scripts [default= %default]", metavar="character")
     )
 
 opt_parser = OptionParser(option_list=option_list)
@@ -32,6 +34,7 @@ if (is.null(opt$file)){
 ##############################################
 t_Zvals<-read.table(opt$file)
 sampleData <- as.matrix(t_Zvals)
+name<-opt$name
 print(dim(sampleData))
 NumRandomM<-opt$random
 start<-opt$start
@@ -44,6 +47,12 @@ sc1<-paste(scripts, "CRobCor.R", sep="/")
 sc3<-paste(scripts, "functions_fdr_MC.R", sep="/")
 source(sc1)
 source(sc3)
-
-estimateFDR(  inputM=sampleData,  NumRandomM,  start,  end,  interval, ncores)
+estimateFDR(  inputM=sampleData,  NumRandomM,  start,  end,  interval, ncores, name)
+print(inputM=sampleData)
+print( NumRandomM)
+print(start)
+print(end)
+print(interval)
+print(ncores)
+print(name)
 
