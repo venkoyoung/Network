@@ -161,10 +161,9 @@ print(getwd())
 }
 
 #####################################################################
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/random/exons/")
-scaledfiles<-read.table("scaledfiles.csv", header = T, stringsAsFactors = F ,sep="\t")
+setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convIR//")
+scaledfiles<-read.table("IR.eventscaled.csv", header = T, stringsAsFactors = F ,sep="\t")
 head(scaledfiles)
-
 for (i in 1:nrow(scaledfiles))
   {
     file<-scaledfiles$file[i]  

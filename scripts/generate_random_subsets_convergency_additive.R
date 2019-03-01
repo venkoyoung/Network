@@ -1,11 +1,12 @@
-#first generate data: TRUE and RANDOM DATA
+  #first generate data: TRUE and RANDOM DATA
 ###############################################################################
 #1:read suppa delta PSI table
-setwd("/home/emancini/Dropbox (CRG)/Personal_Estefania/Network/selectedEventsHs2/")
+setwd("/home/emancini/Dropbox (CRG)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/")
 dir.create("/home/emancini/Dropbox (CRG)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum")
 dir2print<- "/home/emancini/Dropbox (CRG)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/"
 ###############################################################################
 file<-"total_600.txt"
+
 ###############################################################################
 Oname<-gsub("\\.txt", "", file)
 print(Oname)
@@ -86,6 +87,5 @@ for (i in 1:nramdomPoints)
     print(ii)
   }
 }
-
 getwd()
     
