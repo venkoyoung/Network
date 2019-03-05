@@ -161,23 +161,30 @@ print(getwd())
 }
 
 #####################################################################
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convIR//")
-scaledfiles<-read.table("IR.eventscaled.csv", header = T, stringsAsFactors = F ,sep="\t")
+setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/")
+scaledfiles<-read.table("eventscaled_rho_opt.csv", header = T, stringsAsFactors = F ,sep="\t")
 head(scaledfiles)
+getwd()
 for (i in 1:nrow(scaledfiles))
   {
     file<-scaledfiles$file[i]  
     print(file)
     name<-gsub("_eventscaled.tab", "", scaledfiles$file[i])
+    name<-paste("OR", name, sep="_")
     print(name)
     rho<-scaledfiles$rho[i]
     print(rho)
     M<-read.table(file); print(dim(M))
     Cdouble <- CRobCor(M)
+    png(paste(name, "density.png", sep="_"))
+    plot(density(Cdouble), xlim=c(-1,1), col="red")
+    abline(v=0)
+    dev.off()
     gListDouble<-CreateGraph(Cdouble,rho) 
     gList<-gListDouble
     g<-gList[[1]]
     NetworkDesc(g, name, rho)
+    
     }
   
   

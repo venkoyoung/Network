@@ -4,7 +4,7 @@ CRobCor <- function (M,ct=0.5) {
 Mcov<-cov((M),use="all.obs")
 #evalua con Pearson
 Mcor<-cov2cor(Mcov)
-  #Scaling a covariance matrix into a correlation one can be achieved in many ways,
+#Scaling a covariance matrix into a correlation one can be achieved in many ways,
 #mathematically most appealing by multiplication with a diagonal matrix from left and right, 
 #or more efficiently by using sweep(.., FUN = "/") twice. 
 #The cov2cor function is even a bit more efficient, and provided mostly for didactical reasons.  
@@ -24,9 +24,7 @@ MRobCor<-Mcor;
     marg_Mcor<-cov2cor(marg_Mcor)
     DELTA[,,ev]<-abs(marg_Mcor-Mcor)		#marginal Delta Covariance
   }
-  
 INFL<-apply(DELTA,3,sum)/(ncol(M)^2-ncol(M)); #Calculate "influence" of outliers
-  
   for (p_i in 1:(ncol(M)-1)){
     for (p_j in (p_i+1):ncol(M)){
       if (abs(Mcor[p_i,p_j])<0.25) next               
