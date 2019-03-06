@@ -40,3 +40,16 @@ dev.off()
 
 }
 ####################################################################################
+data<-1:600
+?sample
+data1<-sample( data, 10)
+data2<-sample(data,10)
+cor10<-abs(cor(data1,data2))
+data1<-sample( data, 100, replace = T)
+data2<-sample(data,100, replace = T)
+cor100<-abs(cor(data1,data2))
+data1<-sample( data, 1000, replace = T)
+data2<-sample(data,1000, replace = T)
+cor1000<-abs(cor(data1,data2))
+####################################################################################
+order(c(cor10,cor100,cor1000))
