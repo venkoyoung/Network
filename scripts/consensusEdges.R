@@ -15,7 +15,6 @@ finalDF<-data.frame()
 linksList<-list()
 length(linksList)
 nodesList<-list()
-
 for (i in 1:nrow(edgelists))
 {
 
@@ -56,18 +55,17 @@ for (i in 1:length(nodesList))
 #finalMatrixCOmparison
 dim(allNodesDF)
 KDsSum<-rowSums(allNodesDF)
-hist(KDsSum)
+KDsSum
 sort(KDsSum)[1:10]
-  #network de 100 nodos:
+#network de 100 nodos:
 KDs<-sort(KDsSum, decreasing = T)[1:100]#MIN 81
 summary(KDs)
 KDs[1:10]
 KDsSum[1:5]
-
 topNodes<-allNodesDF[names(KDs),]
 dim(topNodes)
 #esto se puede plotear como heatmap
-pdf("presence_ausence_A3_150_30_100_min98.pdf",width = 16,  height = 20)
+pdf("presence_ausence_ES_150_30_100_min98.pdf",width = 16,  height = 20)
 pheatmap(topNodes,
          fontsize = 6, 
          fontsize_row = 10, 
@@ -92,16 +90,25 @@ for (i in 1:length(linksList))
 head(allLinksDF)
 dim(allLinksDF)
 ##################################################################
-filtered<-allLinksDF[rowSums(allLinksDF)>20,]
+head(allLinksDF)
+#filtered<-allLinksDF[rowSums(allLinksDF)>20,]
+filtered<-allLinksDF
 dim(filtered)#343*100
 resultingEdgeList<-data.frame(matrix(unlist(strsplit(rownames(filtered),"-")), ncol=2, byrow = T))
 head(resultingEdgeList)
-colnames(resultingEdgeList)<-c("from","to")
-g<-simplify(graph_from_data_frame(resultingEdgeList, directed = FALSE),remove.multiple = TRUE, remove.loops = TRUE)
+rownames(resultingEdgeList)<-rownames(filtered)
+resultingEdgeList$occur<-rowSums(filtered)
+colnames(resultingEdgeList)<-c("from","to","occur")
+dim(resultingEdgeList)
+write.table(resultingEdgeList,"30_150_100_A3_oc.txt",sep="\t", col.names = NA, quote = F)
+##################################################################
+g<-simplify(graph_from_data_frame(resultingEdgeList[,1:2], directed = FALSE),
+              remove.multiple = TRUE, remove.loops = TRUE)
 df2<-as.data.frame(get.edgelist(g))
+head(df2)
 dim(df2)
-df2$consensus<-rep("30_150_A3", 343)
+g
+df2$consensus<-rep("30_600_all", 41251)
 head(df2)
 colnames(df2)<-c("source", "target","dset")
-getwd()
-write.table(df2,"../../consenso/30_150_100_rho05_A3.txt",sep="\t", col.names = NA, quote = F)
+write.table(df2,"30_600_all_rho05.txt",sep="\t", col.names = NA, quote = F)
