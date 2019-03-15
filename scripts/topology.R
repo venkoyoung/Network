@@ -161,16 +161,19 @@ print(getwd())
 }
 
 #####################################################################
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/")
-scaledfiles<-read.table("eventscaled_rho_opt.csv", header = T, stringsAsFactors = F ,sep="\t")
+setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convIRreplicates/")
+scaledfiles<-read.table("eventscaled.csv", header = T, stringsAsFactors = F ,sep="\t")
+scaledfiles<-read.table("eventscaled.csv", header = F, stringsAsFactors = F ,sep="\t")
 head(scaledfiles)
+colnames(scaledfiles)<-"file"
+scaledfiles$rho<-rep(0.5, nrow(scaledfiles))
 getwd()
 for (i in 1:nrow(scaledfiles))
   {
     file<-scaledfiles$file[i]  
     print(file)
     name<-gsub("_eventscaled.tab", "", scaledfiles$file[i])
-    name<-paste("OR", name, sep="_")
+#    name<-paste("OR", name, sep="_")
     print(name)
     rho<-scaledfiles$rho[i]
     print(rho)
@@ -185,6 +188,6 @@ for (i in 1:nrow(scaledfiles))
     g<-gList[[1]]
     NetworkDesc(g, name, rho)
     
-    }
+  }
   
   

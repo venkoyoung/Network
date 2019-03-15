@@ -1,4 +1,4 @@
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/")
+setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/tabs/")
 topoFiles<-read.table("ORconvTotalSum_smallDF.txt",
                       header = F, stringsAsFactors = F ,sep="\t")
 colnames(topoFiles)<-"file"
@@ -133,6 +133,7 @@ OR<-df
 #####################################
 finalDF$color<-rep("red", nrow(df))
 # get the range for the x and y axis 
+head(finalDF)
 finalDF$ne<-as.numeric(finalDF$ne)
 xrange <- range(finalDF$ne) 
 png("NumberOfEdges_OR.png")
