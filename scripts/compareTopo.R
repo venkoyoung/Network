@@ -1,10 +1,11 @@
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convTotalSum/tabs/")
-topoFiles<-read.table("ORconvTotalSum_smallDF.txt",
+library(ggplot2)
+setwd("/media/emancini/e323fb45-bfcd-44b1-9dc8-cde403de4b5a/rangesDSets/MIC/tabs/")
+  topoFiles<-read.table("smallDF_all.txt",
                       header = F, stringsAsFactors = F ,sep="\t")
 colnames(topoFiles)<-"file"
 topoFiles
-numEvent<-  matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=6)[,4]
-Event<- matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=5)[1,2]
+numEvent<-  matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=7)[,4]
+Event<- matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=7)[,1]
 plotname<-paste(Event, "20-600_OR.png", sep="_")
 df<-data.frame()
 for (i in 1:nrow(topoFiles))  {
@@ -15,30 +16,122 @@ for (i in 1:nrow(topoFiles))  {
   print(name)
   df<-rbind(df, read.table(file, header = F, skip=2) )
 }
-df
+head(df)
+dim(df)
 rownames(df)<-topoFiles$file
 df$V1<-NULL
 colnames(df)<-c("rho","NumOfEdges","NumOfVertices","MeanDegree","Diameter","Diameter2")
-df$ne<-     matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=6)[,4]
-df<-df[order(as.numeric(df$ne)),]
-head(df)
-######################
-dfA3<-df; dim(dfA3); #7,7
-dfA3$color<-rep("blue", nrow(dfA3))
-dfA5<-df; dim(dfA5); #7,7
-dfA5$color<-rep("red", nrow(dfA5))
-dfES<-df; dim(dfES);# 7,7
-dfES$color<-rep("green", nrow(dfES))
-dfIR<-df; dim(dfIR)# 7,7
-dfIR$color<-rep("orange", nrow(dfIR))
-#cargo todos lo DFs y luego los comnbino y ploteo todo junto
-finalDF<-rbind(dfA5, dfA3, dfIR, dfES)
-head(finalDF)
-######################
-#Plots
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/allConv/")
-write.table(finalDF,"finalDF.tab", col.names = NA, sep="\t")
-finalDF$color<-as.factor(finalDF$color)
+df$nrep<- matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=7)[,5]
+df$ne<-   as.numeric(matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=7)[,4])
+df$event<- matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=7)[,1]
+df$range<- matrix(unlist(strsplit(as.character(topoFiles$file), "_")), byrow = T , ncol=7)[,3]
+table(df$range)
+#################################################
+dfMIC<-df[df$event=="MIC",]
+dfMIC0<-df[df$range=="range0",]
+dim(dfMIC0)
+dfMIC5<-df[df$range=="range5",]
+dim(dfMIC5)
+dfMIC15<-df[df$range=="range15",]
+dim(dfMIC15)
+dfMIC0$ne
+dfMIC5$ne
+dfMIC15$ne
+
+plot(dfMIC5$ne, dfMIC5$NumOfEdges)
+plot(dfMIC15$ne, dfMIC15$NumOfEdges)
+lines(meanMIC15$Group.1,meanMIC15$x)
+meanMIC0<-aggregate(dfMIC0$NumOfEdges, by=list(dfMIC0$ne), FUN=mean)
+meanMIC5<-aggregate(dfMIC5$NumOfEdges, by=list(dfMIC5$ne), FUN=mean)
+meanMIC15<-aggregate(dfMIC15$NumOfEdges, by=list(dfMIC15$ne), FUN=mean)
+
+
+dir.create("plots")
+pdf("../plots/MIC_all_Events_NumofEdges.pdf", width = 11.69,  height = 8.27)
+  ggplot(df) + 
+  geom_point(aes(x = ne, y = NumOfEdges, color=range), size=0.1)+
+  theme_classic()   +
+  geom_line(data=meanMIC0, aes(x=Group.1, y=x))+
+    geom_line(data=meanMIC5, aes(x=Group.1, y=x))+    
+    geom_line(data=meanMIC15, aes(x=Group.1, y=x))+    
+  scale_x_continuous(breaks = seq(0, 500, by = 20), name="Number of events",limits = c(0,600))+
+  #scale_y_continuous(breaks = seq(0, 50000, by = 1000), name="Number of Edges",limits = c(0,10000))+
+  scale_y_continuous( name="Number of Edges")+
+  geom_hline(yintercept=c(0, 1000), color='black', size=0.3)+
+  geom_vline(xintercept=0, color='black', size=0.3)+
+  theme(
+  axis.text.x = element_text(angle = -90, hjust = 0.5, size = 5))  
+  dev.off()
+####################################################################
+mean_V_MIC0<-aggregate(dfMIC0$NumOfVertices, by=list(dfMIC0$ne), FUN=mean)
+mean_V_MIC5<-aggregate(dfMIC5$NumOfVertices, by=list(dfMIC5$ne), FUN=mean)
+mean_V_MIC15<-aggregate(dfMIC15$NumOfVertices, by=list(dfMIC15$ne), FUN=mean)
+  
+pdf("plots/MIC_all_NumberOfVertices.pdf", width = 11.69,  height = 8.27)
+ggplot(df) + 
+  geom_point(aes(x = ne, y = NumOfVertices, color=range), size=0.1)+
+  theme_classic()   +
+  geom_line(data=mean_V_MIC0, aes(x=Group.1, y=x))+
+  geom_line(data=mean_V_MIC5, aes(x=Group.1, y=x))+
+  geom_line(data=mean_V_MIC15, aes(x=Group.1, y=x))+
+  scale_x_continuous(breaks = seq(0, 500, by = 20), name="Number of events", limits = c(0,600))+
+  scale_y_continuous(breaks = seq(0, 300, by = 20), name="Number of Vertices (KDs)",
+                     limits = c(0,300))+
+  theme(  axis.text.x = element_text(angle = -90, hjust = 0.5, size = 5)) +
+  geom_hline(yintercept=0, color='black', size=0.3)+
+  geom_vline(xintercept=0, color='black', size=0.3)
+dev.off()
+
+#################################################################
+pdf("plots/Mix_NumofEdges.pdf")
+ggplot(dfMix) + geom_point(aes(x = ne, y = NumOfEdges), size=0.1)+
+theme_classic()   +
+geom_line(data=meanTotalNE, aes(x=Group.1, y=x))+
+scale_x_continuous(breaks = seq(0, 600, by = 20), name="Number of events")+
+scale_y_continuous( name="Number of Edges")+
+theme(
+  axis.text.x = element_text(angle = -90, hjust = 0.5, size = 8)) 
+dev.off()
+#################################################################
+pdf("plots/Mix_NumofVertices.pdf")
+ggplot(dfMix) + geom_point(aes(x = ne, y = NumOfVertices), size=0.1)+
+  theme_classic()   +
+  geom_line(data=meanTotalNV, aes(x=Group.1, y=x))+
+  scale_x_continuous(breaks = seq(0, 600, by = 20), name="Number of events")+
+  scale_y_continuous(breaks = seq(0, 300, by = 20), name="Number of Vertices (KDs)")+
+  theme(
+  axis.text.x = element_text(angle = -90, hjust = 0.5, size = 8)) 
+dev.off()
+################################################################
+pdf("plots/all_NumofVertices.pdf")
+ggplot(df) + geom_point(aes(x = ne, y = NumOfVertices,  color=event), size=0.3)+
+  theme_classic()   +
+  geom_line(data=meanTotalNV, aes(x=Group.1, y=x), color="purple")+
+  geom_line(data=meanExNV, aes(x=Group.1, y=x), color="green")+
+  geom_line(data=meanInNV, aes(x=Group.1, y=x), color="blue")+
+  geom_line(data=meanA5NV, aes(x=Group.1, y=x), color="yellow")+
+  geom_line(data=meanA3NV, aes(x=Group.1, y=x), color="red")+
+  scale_x_continuous(breaks = seq(0, 600, by = 20), name="Number of events")+
+  scale_y_continuous(breaks = seq(0, 300, by = 20), name="Number of Vertices (KDs)")+
+  theme( axis.text.x = element_text(angle = -90, hjust = 0.5, size = 8)) 
+dev.off()
+##################################################################
+pdf("plots/all_NumofEdges_lines.pdf")
+ggplot(df) +
+# geom_point(aes(x = ne, y = NumOfEdges,  color=event), size=0.3)+
+  theme_classic()   +
+  geom_line(data=meanTotalNE, aes(x=Group.1, y=x), color="purple")+
+  geom_line(data=meanExNE, aes(x=Group.1, y=x), color="green")+
+  geom_line(data=meanInNE, aes(x=Group.1, y=x), color="blue")+
+  geom_line(data=meanA5NE, aes(x=Group.1, y=x), color="yellow")+
+  geom_line(data=meanA3NE, aes(x=Group.1, y=x), color="red")+
+  scale_x_continuous(breaks = seq(0, 600, by = 20), name="Number of events")+
+  #scale_y_continuous(name="Number of Edges")+
+  scale_y_continuous( name="Number of Edges", limits = c(0,7000))+
+  theme( axis.text.x = element_text(angle = -90, hjust = 0.5, size = 8)) 
+dev.off()
+
+
 ntrees <- levels(finalDF$color)
 # get the range for the x and y axis 
 finalDF$ne<-as.numeric(finalDF$ne)

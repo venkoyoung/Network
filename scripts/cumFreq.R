@@ -55,7 +55,14 @@ plot(df$deg,df$cum,
      xlab="Degree", ylab="Cumulative Freq",
      main=paste("Cumulative Freq",plotname))
 lines(dfAg$deg,dfAg$cum, col="red",cex=2)
-dev.off()
+dev.off()setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convIR/")
+freqFiles<-read.table("IR_cumulative_files.txt",
+                      header = F, stringsAsFactors = F ,sep="\t")
+colnames(freqFiles)<-"file"
+freqFiles
+numEvent<- matrix(unlist(strsplit(as.character(freqFiles$file), "_")), byrow = T , ncol=4)[,3]
+Event<- matrix(unlist(strsplit(as.character(freqFiles$file), "_")), byrow = T , ncol=4)[1,1]
+
 ###############################################################
 meanA3<-dfAg; dim(meanA3)
 meanA5<-dfAg; dim(meanA5)

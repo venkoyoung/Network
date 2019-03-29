@@ -159,35 +159,35 @@ print(getwd())
 ##############################################################
 #normalized degree
 }
-
 #####################################################################
-setwd("~/Dropbox (CRG ADV)/Personal_Estefania/Network/selectedEventsHs2/convIRreplicates/")
-scaledfiles<-read.table("eventscaled.csv", header = T, stringsAsFactors = F ,sep="\t")
-scaledfiles<-read.table("eventscaled.csv", header = F, stringsAsFactors = F ,sep="\t")
-head(scaledfiles)
+getwd()
+setwd("/media/emancini/e323fb45-bfcd-44b1-9dc8-cde403de4b5a/rangesDSets/MIC/")
+scaledfiles<-read.table("eventscaled.tab", header = F, stringsAsFactors = F ,sep="\t")
+scaledfiles
 colnames(scaledfiles)<-"file"
 scaledfiles$rho<-rep(0.5, nrow(scaledfiles))
-getwd()
-for (i in 1:nrow(scaledfiles))
-  {
-    file<-scaledfiles$file[i]  
-    print(file)
-    name<-gsub("_eventscaled.tab", "", scaledfiles$file[i])
-#    name<-paste("OR", name, sep="_")
-    print(name)
-    rho<-scaledfiles$rho[i]
-    print(rho)
-    M<-read.table(file); print(dim(M))
-    Cdouble <- CRobCor(M)
-    png(paste(name, "density.png", sep="_"))
-    plot(density(Cdouble), xlim=c(-1,1), col="red")
-    abline(v=0)
-    dev.off()
-    gListDouble<-CreateGraph(Cdouble,rho) 
-    gList<-gListDouble
-    g<-gList[[1]]
-    NetworkDesc(g, name, rho)
+  for (i in 1:nrow(scaledfiles))
+      {
+        file<-scaledfiles$file[i]  
+        print(file)
+        name<-gsub("_eventscaled.tab", "", scaledfiles$file[i])
+    #    name<-paste("OR", name, sep="_")
+        print(name)
+        rho<-scaledfiles$rho[i]
+        print(rho)
+        M<-read.table(file); print(dim(M))
+        
+        Cdouble <- CRobCor(M)
+        
+        png(paste(name, "density.png", sep="_"))
+        plot(density(Cdouble), xlim=c(-1,1), col="red")
+        abline(v=0)
+        dev.off()
+        
+        gListDouble<-CreateGraph(Cdouble,rho) 
+        gList<-gListDouble
+        g<-gList[[1]]
+        NetworkDesc(g, name, rho)
+          
+      }
     
-  }
-  
-  
